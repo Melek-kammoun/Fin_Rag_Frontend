@@ -1,0 +1,42 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid #eef0fb;
+  color: #1e1e2e;
+  flex-shrink: 0;
+
+  .app-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+
+    i { color: #22c55e; }
+  }
+}
+
+.app-body {
+  flex: 1;
+  min-height: 0;
+}
+
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  background: #1a2235;
+  color: #a0b4cc;
+  font-size: 0.72rem;
+  flex-shrink: 0;
+}

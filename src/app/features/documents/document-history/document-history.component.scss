@@ -1,0 +1,54 @@
+.history-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.history-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 900px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .history-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: #eef0fb;
+    color: #1e1e2e;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a2235;
+  }
+
+  .history-subtitle {
+    font-size: 0.85rem;
+    color: #5a7a9a;
+    margin-top: 0.15rem;
+  }
+}
+
+.empty-row {
+  text-align: center;
+  color: #888;
+  padding: 1.5rem 0;
+}

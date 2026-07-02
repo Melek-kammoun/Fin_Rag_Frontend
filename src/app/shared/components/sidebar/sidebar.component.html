@@ -1,0 +1,23 @@
+<div class="sidebar">
+
+  <ul class="menu">
+    <li *ngFor="let item of menuItems">
+      <a *ngIf="!item.children" [routerLink]="item.route" routerLinkActive="active">
+        <i [class]="item.icon"></i>
+        <span>{{ item.label }}</span>
+      </a>
+
+      <a *ngIf="item.children" (click)="toggle(item)" class="has-children" [class.open]="item.open">
+        <i [class]="item.icon"></i>
+        <span>{{ item.label }}</span>
+        <i class="pi pi-chevron-down chevron"></i>
+      </a>
+
+      <ul class="submenu" *ngIf="item.children && item.open">
+        <li *ngFor="let child of item.children">
+          <a [routerLink]="child.route" routerLinkActive="active">{{ child.label }}</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>

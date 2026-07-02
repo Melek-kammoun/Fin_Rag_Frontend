@@ -1,0 +1,66 @@
+<div class="upload-container">
+  <div class="upload-card">
+    <div class="upload-header">
+      <span class="upload-icon"><i class="pi pi-file-pdf"></i></span>
+      <div>
+        <h2>{{ title }}</h2>
+        <p class="upload-subtitle">{{ subtitle }}</p>
+      </div>
+    </div>
+
+    <div class="upload-dropzone" [class.has-file]="selectedFile">
+      <p-fileUpload
+        mode="basic"
+        accept=".pdf"
+        [auto]="false"
+        chooseLabel="Choisir un PDF"
+        chooseIcon="pi pi-upload"
+        (onSelect)="onFileSelect($event)">
+      </p-fileUpload>
+      <span class="file-name" *ngIf="selectedFile">
+        <i class="pi pi-check-circle"></i> {{ selectedFile.name }}
+      </span>
+    </div>
+
+    <p-button
+      [label]="loading ? 'Ingestion en cours…' : 'Lancer l\'ingestion'"
+      icon="pi pi-send"
+      [loading]="loading"
+      [disabled]="!selectedFile || loading"
+      (onClick)="upload()"
+      styleClass="upload-btn">
+    </p-button>
+
+    <div class="upload-status" *ngIf="loading">
+      <p-progressSpinner
+        [style]="{ width: '28px', height: '28px' }"
+        strokeWidth="5"
+        fill="transparent"
+        animationDuration="0.8s"
+        ariaLabel="Ingestion en cours">
+      </p-progressSpinner>
+      <div class="upload-status-text">
+        <strong>Ingestion en cours</strong>
+        <span>Analyse et découpage du document…</span>
+      </div>
+    </div>
+
+    <p-message
+      *ngIf="response?.success"
+      severity="success"
+      text="Ingestion réussie en {{ response!.durationMs }} ms — {{ response!.chunkCount }} chunk(s) généré(s)">
+    </p-message>
+
+    <p-message
+      *ngIf="response && !response.success"
+      severity="error"
+      [text]="response.error">
+    </p-message>
+
+    <p-message
+      *ngIf="errorMessage"
+      severity="error"
+      [text]="errorMessage">
+    </p-message>
+  </div>
+</div>

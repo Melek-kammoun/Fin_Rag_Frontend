@@ -1,0 +1,122 @@
+.upload-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.upload-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 900px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+.upload-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .upload-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: #eef0fb;
+    color: #1e1e2e;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a2235;
+  }
+
+  .upload-subtitle {
+    font-size: 0.85rem;
+    color: #5a7a9a;
+    margin-top: 0.15rem;
+  }
+}
+
+.upload-dropzone {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border: 1.5px dashed #d8dae6;
+  border-radius: 10px;
+  background: #fafbfe;
+  transition: border-color 0.2s, background 0.2s;
+
+  // le p-fileUpload en mode "basic" affiche déjà le nom du fichier choisi ;
+  // on le masque pour ne garder que notre .file-name stylisé ci-dessous
+  ::ng-deep .p-fileupload-basic > span {
+    display: none;
+  }
+
+  &.has-file {
+    border-color: #2a2a3e;
+    background: #f3f4fb;
+  }
+
+  .file-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #2a2a3e;
+
+    i {
+      color: #22c55e;
+    }
+  }
+}
+
+.upload-btn {
+  align-self: flex-start;
+}
+
+::ng-deep .upload-btn.p-button {
+  background: #64b5a0;
+  border-color: #64b5a0;
+  color: #fff;
+
+  &:not(:disabled):hover {
+    background: #4fa08a;
+    border-color: #4fa08a;
+  }
+}
+
+.upload-status {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 10px;
+  background: #f3f4fb;
+
+  .upload-status-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+
+    strong {
+      font-size: 0.85rem;
+      color: #1a2235;
+    }
+
+    span {
+      font-size: 0.78rem;
+      color: #5a7a9a;
+    }
+  }
+}

@@ -1,0 +1,11 @@
+.user-layout {
+  display: flex;
+  height: 100%;
+
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #f0f4f8;
+    padding: 2rem;
+  }
+}

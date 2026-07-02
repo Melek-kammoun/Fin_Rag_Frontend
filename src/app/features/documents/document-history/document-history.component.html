@@ -1,0 +1,49 @@
+<div class="history-container">
+  <div class="history-card">
+    <div class="history-header">
+      <span class="history-icon"><i class="pi pi-history"></i></span>
+      <div>
+        <h2>Historique des ingestions</h2>
+        <p class="history-subtitle">{{ subtitle }}</p>
+      </div>
+    </div>
+
+    <p-table
+      [value]="history"
+      [loading]="loading"
+      [paginator]="true"
+      [rows]="10"
+      [tableStyle]="{ 'min-width': '40rem' }">
+      <ng-template #header>
+        <tr>
+          <th>Fichier</th>
+          <th>Chunks</th>
+          <th>Durée</th>
+          <th>Statut</th>
+          <th>Date</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-item>
+        <tr>
+          <td>{{ item.filename }}</td>
+          <td>{{ item.chunkCount }}</td>
+          <td>{{ item.durationMs }} ms</td>
+          <td>
+            <p-tag
+              [value]="item.success ? 'Succès' : 'Échec'"
+              [severity]="item.success ? 'success' : 'danger'">
+            </p-tag>
+          </td>
+          <td>{{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="5" class="empty-row">Aucune ingestion enregistrée pour le moment.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

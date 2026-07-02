@@ -1,0 +1,66 @@
+<div class="assistant-container">
+  <div class="assistant-card">
+    <div class="assistant-header">
+      <span class="assistant-icon"><i class="pi pi-comments"></i></span>
+      <div>
+        <h2>Assistant</h2>
+        <p class="assistant-subtitle">Posez une question sur vos rapports et la réglementation</p>
+      </div>
+    </div>
+
+    <textarea
+      pTextarea
+      [(ngModel)]="question"
+      rows="3"
+      [autoResize]="true"
+      placeholder="Ex : Quel est le ratio de solvabilité mentionné dans le dernier rapport ?"
+      class="assistant-input">
+    </textarea>
+
+    <p-button
+      [label]="loading ? 'Génération en cours…' : 'Envoyer'"
+      icon="pi pi-send"
+      [loading]="loading"
+      [disabled]="!question.trim() || loading"
+      (onClick)="ask()"
+      styleClass="assistant-btn">
+    </p-button>
+
+    <div class="assistant-status" *ngIf="loading">
+      <p-progressSpinner
+        [style]="{ width: '28px', height: '28px' }"
+        strokeWidth="5"
+        fill="transparent"
+        animationDuration="0.8s"
+        ariaLabel="Génération en cours">
+      </p-progressSpinner>
+      <div class="assistant-status-text">
+        <strong>Recherche et génération en cours</strong>
+        <span>Analyse des documents et rédaction de la réponse…</span>
+      </div>
+    </div>
+
+    <div class="assistant-answer" *ngIf="response">
+      <h3>Réponse</h3>
+      <p>{{ response.answer }}</p>
+
+      <div class="assistant-sources" *ngIf="response.sources.length">
+        <h4>Sources</h4>
+        <ul>
+          <li *ngFor="let source of response.sources">
+            <i class="pi pi-file"></i>
+            <span>{{ source.filename }}</span>
+            <span class="page">p.{{ source.page }}</span>
+            <span class="score">{{ (source.score * 100).toFixed(0) }}%</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <p-message
+      *ngIf="errorMessage"
+      severity="error"
+      [text]="errorMessage">
+    </p-message>
+  </div>
+</div>

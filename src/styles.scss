@@ -1,1 +1,17 @@
-/* You can add global styles to this file, and also import other style files */
+@layer tailwind-base, primeng;
+
+@import "primeicons/primeicons.css";
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  background-color: #f0f4f8;
+  color: #333;
+}
