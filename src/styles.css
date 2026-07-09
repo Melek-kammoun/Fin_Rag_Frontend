@@ -1,0 +1,71 @@
+@import 'primeicons/primeicons.css';
+
+:root {
+  /* Navy scale */
+  --frg-navy-950: #02050a;
+  --frg-navy-900: #040810;
+  --frg-navy-800: #060b16;
+  --frg-navy-700: #0b1526;
+  --frg-navy-600: #0f1e35;
+  --frg-navy-500: #16253f;
+  --frg-navy-400: #1c2f4d;
+  --frg-navy-300: #233a5c;
+
+  /* Gold scale */
+  --frg-gold-300: #e8cd7a;
+  --frg-gold-400: #d6b94b;
+  --frg-gold-500: #c9a227;
+  --frg-gold-600: #b8901f;
+
+  /* Text */
+  --frg-text-primary: #eef1f6;
+  --frg-text-secondary: #9aa8c0;
+  --frg-text-muted: #64738f;
+
+  /* Status */
+  --frg-success: #3fae82;
+  --frg-danger: #e26a6a;
+  --frg-info: #5aa4d8;
+  --frg-warn: #d6b94b;
+
+  --frg-font-sans: 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--frg-font-sans);
+  background: radial-gradient(circle at top left, #0c1830 0%, var(--frg-navy-800) 45%, var(--frg-navy-950) 100%);
+  background-attachment: fixed;
+  color: var(--frg-text-primary);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(214, 185, 75, 0.3);
+  color: var(--frg-text-primary);
+}
+
+/* Slim gold-on-navy scrollbar for that corporate polish */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--frg-navy-800);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--frg-navy-400);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--frg-gold-600);
+}
