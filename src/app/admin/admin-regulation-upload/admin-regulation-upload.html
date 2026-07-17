@@ -1,0 +1,194 @@
+<section class="upload-page">
+  <div class="page-shell panel">
+    <div class="panel-header">
+      <div class="panel-icon"><i class="pi pi-shield"></i></div>
+      <div>
+        <h2>Regulation Ingestion</h2>
+        <p class="page-intro">
+          Upload a regulatory document and index it into <strong>fin-regulation</strong>
+        </p>
+      </div>
+    </div>
+
+    <div class="panel-body">
+      <div class="form-grid">
+        <div class="field field-file">
+          <label>
+            Document
+            <p-fileupload
+              mode="basic"
+              accept=".pdf"
+              chooseLabel="Choose File"
+              chooseIcon="pi pi-file-pdf"
+              [auto]="false"
+              [customUpload]="true"
+              [maxFileSize]="52428800"
+              (onSelect)="onFileSelected($event)"
+              (onClear)="onFileCleared()"
+            />
+          </label>
+          <small *ngIf="selectedFile" class="selected-file">
+            <i class="pi pi-check-circle"></i> {{ selectedFile.name }}
+          </small>
+        </div>
+
+        <div class="field">
+          <label>
+            Strategy
+            <p-select
+              [options]="strategyOptions"
+              [(ngModel)]="strategy"
+              name="strategy"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select a strategy"
+              [fluid]="true"
+            />
+          </label>
+        </div>
+
+        <div class="field">
+          <label>
+            Chunk size
+            <p-inputNumber
+              [(ngModel)]="chunkSize"
+              name="chunkSize"
+              [min]="100"
+              [max]="2000"
+              [showButtons]="true"
+              [fluid]="true"
+            />
+          </label>
+        </div>
+
+        <div class="field">
+          <label>
+            Overlap
+            <p-inputNumber
+              [(ngModel)]="overlap"
+              name="overlap"
+              [min]="0"
+              [max]="500"
+              [showButtons]="true"
+              [fluid]="true"
+            />
+          </label>
+        </div>
+      </div>
+
+      <div class="actions">
+        <p-button
+          label="Start ingestion"
+          icon="pi pi-upload"
+          [loading]="submitting"
+          [disabled]="!selectedFile || submitting"
+          (onClick)="submit()"
+        />
+      </div>
+
+      <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage" styleClass="form-message" />
+    </div>
+  </div>
+
+  <div class="page-shell panel" *ngIf="currentJob">
+    <div class="panel-header">
+      <div class="panel-icon"><i class="pi pi-chart-line"></i></div>
+      <div>
+        <h2>{{ getPanelTitle(currentJob) }}</h2>
+        <p class="page-intro">Real-time ingestion pipeline</p>
+      </div>
+    </div>
+
+    <div class="panel-body">
+      <div class="job-summary">
+        <div class="job-summary-main">
+          <div class="job-current-step" *ngIf="currentJob.status !== 'COMPLETED' && currentJob.status !== 'FAILED'">
+            {{ getStepLabel(currentJob.status) }}
+          </div>
+          <div class="job-filename">
+            <i class="pi pi-file-pdf"></i>
+            {{ currentJob.filename }}
+          </div>
+          <div class="job-id">Job ID: {{ currentJob.id }}</div>
+        </div>
+
+        <p-tag
+          [value]="currentJob.status"
+          [severity]="getTagSeverity(currentJob.status)"
+        />
+      </div>
+
+      <div class="meta-chips">
+        <div class="meta-chip">
+          <i class="pi pi-sitemap"></i>
+          <span class="meta-chip-label">Strategy</span>
+          <span class="meta-chip-value">{{ formatStrategy(currentJob.strategy) }}</span>
+        </div>
+        <div class="meta-chip">
+          <i class="pi pi-align-justify"></i>
+          <span class="meta-chip-label">Chunk size</span>
+          <span class="meta-chip-value">{{ currentJob.chunkSize }}</span>
+        </div>
+        <div class="meta-chip">
+          <i class="pi pi-arrows-h"></i>
+          <span class="meta-chip-label">Overlap</span>
+          <span class="meta-chip-value">{{ currentJob.overlap }}</span>
+        </div>
+        <div class="meta-chip">
+          <i class="pi pi-database"></i>
+          <span class="meta-chip-label">Store</span>
+          <span class="meta-chip-value">{{ currentJob.store }}</span>
+        </div>
+      </div>
+
+      <div class="step-tracker">
+        <div
+          class="step-card"
+          *ngFor="let step of steps; let i = index"
+          [class.step-done]="isStepDone(i, currentJob)"
+          [class.step-current]="isStepCurrent(i, currentJob)"
+          [class.step-failed]="isStepFailed(i, currentJob)"
+        >
+          <div class="step-circle">
+            <i class="pi pi-check" *ngIf="isStepDone(i, currentJob)"></i>
+            <i class="pi pi-times" *ngIf="isStepFailed(i, currentJob)"></i>
+            <i
+              class="pi pi-spin pi-spinner"
+              *ngIf="isStepCurrent(i, currentJob) && !isStepFailed(i, currentJob)"
+            ></i>
+            <span *ngIf="!isStepDone(i, currentJob) && !isStepCurrent(i, currentJob) && !isStepFailed(i, currentJob)">
+              {{ i + 1 }}
+            </span>
+          </div>
+          <div class="step-text">
+            <div class="step-title">{{ step.label }}</div>
+            <div class="step-desc">{{ getStepDescription(step, currentJob) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-block" *ngIf="currentJob.status !== 'COMPLETED' && currentJob.status !== 'FAILED'">
+        <p-progressBar [value]="currentJob.progress"></p-progressBar>
+        <div class="progress-meta">
+          <span class="progress-value">{{ currentJob.progress }}%</span>
+          <span *ngIf="currentJob.chunkCount !== null" class="chunk-badge">
+            <i class="pi pi-th-large"></i> {{ currentJob.chunkCount }} chunks generated
+          </span>
+        </div>
+      </div>
+
+      <p-message
+        *ngIf="currentJob.status === 'COMPLETED'"
+        severity="success"
+        [text]="'Ingestion completed successfully' + (currentJob.chunkCount !== null ? ' — ' + currentJob.chunkCount + ' chunks generated.' : '.')"
+        styleClass="form-message"
+      />
+
+      <p-message
+        *ngIf="currentJob.status === 'FAILED'"
+        severity="error"
+        styleClass="form-message"
+      />
+    </div>
+  </div>
+</section>

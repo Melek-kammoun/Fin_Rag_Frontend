@@ -1,0 +1,94 @@
+<section class="page-shell history-page">
+  <p-card header="Regulation Ingestion History">
+    <p-table
+      #dt
+      [value]="jobs"
+      [loading]="loading"
+      [tableStyle]="{ 'min-width': '70rem' }"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [globalFilterFields]="['filename', 'strategy', 'status']"
+      [sortOrder]="-1"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="caption">
+        <div class="toolbar">
+          <p-iconfield iconPosition="left" class="search-field">
+            <p-inputicon styleClass="pi pi-search" />
+            <input
+              pInputText
+              type="text"
+              placeholder="Search filename, strategy, status..."
+              (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            />
+          </p-iconfield>
+
+          <p-select
+            [options]="statusOptions"
+            [(ngModel)]="statusFilter"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Filter by status"
+            (onChange)="dt.filter($event.value, 'status', 'equals')"
+            [showClear]="true"
+          />
+
+          <p-button
+            label="Refresh"
+            icon="pi pi-refresh"
+            (onClick)="loadJobs()"
+            [loading]="loading"
+          />
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="filename">Filename <p-sortIcon field="filename" /></th>
+          <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
+          <th pSortableColumn="strategy">Strategy <p-sortIcon field="strategy" /></th>
+          <th>Chunk Size</th>
+          <th>Overlap</th>
+          <th pSortableColumn="chunkCount">Chunks <p-sortIcon field="chunkCount" /></th>
+          <th class="actions-col">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-job>
+        <tr>
+          <td>{{ job.filename || '-' }}</td>
+          <td>
+            <p-tag
+              [value]="job.status"
+              [severity]="getTagSeverity(job.status)"
+            />
+          </td>
+          <td>{{ job.strategy }}</td>
+          <td>{{ job.chunkSize }}</td>
+          <td>{{ job.overlap }}</td>
+          <td>{{ job.chunkCount ?? '-' }}</td>
+          <td class="actions-col">
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              [text]="true"
+              [rounded]="true"
+              pTooltip="Delete this ingestion job"
+              tooltipPosition="top"
+              [loading]="deletingId === job.id"
+              [disabled]="deletingId === job.id"
+              (onClick)="confirmDelete(job)"
+            />
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">No ingestion jobs found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</section>

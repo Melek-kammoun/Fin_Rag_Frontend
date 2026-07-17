@@ -2,6 +2,7 @@ export type IngestionJobStatus =
   | 'PENDING'
   | 'PARSING'
   | 'CHUNKING'
+  | 'EMBEDDING'
   | 'SAVING'
   | 'COMPLETED'
   | 'FAILED';

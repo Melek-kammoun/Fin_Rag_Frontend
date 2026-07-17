@@ -16,7 +16,7 @@ export const routes: Routes = [
   {
     path: 'admin/regulations/history',
     loadComponent: () =>
-      import('./pages/admin-regulation-history.component').then(
+      import('./admin/admin-regulation-history/admin-regulation-history').then(
         (m) => m.AdminRegulationHistoryComponent
       ),
   },

@@ -32,4 +32,8 @@ export class AdminRegulationApiService {
   listJobs(): Observable<IngestionJob[]> {
     return this.http.get<IngestionJob[]>(`${this.baseUrl}/jobs`);
   }
+
+  deleteJob(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/jobs/${id}`);
+  }
 }

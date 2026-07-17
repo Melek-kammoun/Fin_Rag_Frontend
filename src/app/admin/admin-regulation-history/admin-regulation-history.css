@@ -1,0 +1,22 @@
+.history-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.search-field {
+  flex: 1 1 260px;
+  min-width: 220px;
+}
+
+.actions-col {
+  width: 4rem;
+  text-align: center;
+}
