@@ -40,6 +40,7 @@ type StatusFilterOption = {
 })
 export class AdminRegulationHistoryComponent implements OnInit {
   private readonly api = inject(AdminRegulationApiService);
+  //forcer update
   private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChild('dt') table!: Table;
@@ -47,6 +48,7 @@ export class AdminRegulationHistoryComponent implements OnInit {
   jobs: IngestionJob[] = [];
   loading = false;
   statusFilter: IngestionJobStatus | null = null;
+  //id job
   deletingId: number | null = null;
 
   readonly statusOptions: StatusFilterOption[] = [
