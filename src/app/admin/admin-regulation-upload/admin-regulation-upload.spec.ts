@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AdminRegulationUpload } from './admin-regulation-upload';
+import { AdminRegulationUploadComponent } from './admin-regulation-upload';
 
-describe('AdminRegulationUpload', () => {
-  let component: AdminRegulationUpload;
-  let fixture: ComponentFixture<AdminRegulationUpload>;
+describe('AdminRegulationUploadComponent', () => {
+  let component: AdminRegulationUploadComponent;
+  let fixture: ComponentFixture<AdminRegulationUploadComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdminRegulationUpload],
+      imports: [AdminRegulationUploadComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdminRegulationUpload);
+    fixture = TestBed.createComponent(AdminRegulationUploadComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

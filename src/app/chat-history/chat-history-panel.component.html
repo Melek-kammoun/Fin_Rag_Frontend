@@ -1,0 +1,222 @@
+<div class="chat-layout">
+
+  <aside class="sidebar">
+
+    <button
+      type="button"
+      class="new-conversation-button"
+      (click)="createConversation()"
+      [disabled]="streaming"
+    >
+      <i class="pi pi-plus"></i>
+      Nouvelle conversation
+    </button>
+
+    <div
+      class="sidebar-loading"
+      *ngIf="loadingConversations"
+    >
+      <p-progressSpinner
+        styleClass="small-spinner"
+        strokeWidth="6"
+      />
+    </div>
+
+    <button
+      type="button"
+      class="conversation-item"
+      *ngFor="let conversation of conversations"
+      [class.active]="
+        conversation.id
+          === selectedConversationId
+      "
+      (click)="
+        openConversation(
+          conversation.id
+        )
+      "
+    >
+      <span class="conversation-title">
+        {{ conversation.title }}
+      </span>
+
+      <span
+        class="delete-conversation"
+        (click)="
+          deleteConversation(
+            conversation.id,
+            $event
+          )
+        "
+      >
+        <i class="pi pi-trash"></i>
+      </span>
+    </button>
+
+  </aside>
+
+  <section class="chat-main">
+
+    <div
+      class="error-banner"
+      *ngIf="errorMessage"
+    >
+      {{ errorMessage }}
+    </div>
+
+    <div
+      class="messages-container"
+      #messagesContainer
+    >
+
+      <div
+        class="empty-chat"
+        *ngIf="
+          !loadingMessages
+          && messages.length === 0
+        "
+      >
+        <i class="pi pi-comments"></i>
+
+        <p>
+          Posez une question sur vos
+          rapports financiers.
+        </p>
+      </div>
+
+      <div
+        class="loading-messages"
+        *ngIf="loadingMessages"
+      >
+        <p-progressSpinner
+          styleClass="small-spinner"
+          strokeWidth="6"
+        />
+      </div>
+
+      <div
+        class="message-row"
+        *ngFor="let message of messages"
+        [class.user]="
+          message.role === 'USER'
+        "
+        [class.assistant]="
+          message.role === 'ASSISTANT'
+        "
+      >
+
+        <div class="message-bubble">
+
+          <div class="message-role">
+            {{
+              message.role === 'USER'
+                ? 'Vous'
+                : 'Assistant'
+            }}
+          </div>
+
+          <div class="message-content">
+            {{ message.content }}
+            <span
+              class="streaming-cursor"
+              *ngIf="
+                message.pending
+                && message.role
+                  === 'ASSISTANT'
+              "
+            ></span>
+          </div>
+
+          <div
+            class="message-error"
+            *ngIf="message.error"
+          >
+            {{ message.error }}
+          </div>
+
+          <div
+            class="sources"
+            *ngIf="
+              message.sources
+              && message.sources.length
+            "
+          >
+            <div class="sources-title">
+              Sources
+            </div>
+
+            <div
+              class="source-item"
+              *ngFor="
+                let source
+                of message.sources
+              "
+            >
+              <i class="pi pi-file"></i>
+
+              <span>
+                {{ source.filename }}
+              </span>
+
+              <span
+                *ngIf="
+                  source.page !== null
+                "
+              >
+                page {{ source.page }}
+              </span>
+
+              <p-tag
+                *ngIf="
+                  source.score !== null
+                  && source.score !== undefined
+                "
+                [value]="
+                  (source.score * 100)
+                    .toFixed(0) + '%'
+                "
+              />
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="composer">
+
+      <textarea
+        pTextarea
+        [(ngModel)]="question"
+        rows="2"
+        [autoResize]="true"
+        placeholder="
+          Posez une question sur
+          le rapport...
+        "
+        [disabled]="streaming"
+        (keydown.enter)="onEnter($event)"
+      ></textarea>
+
+      <p-button
+        *ngIf="!streaming"
+        icon="pi pi-send"
+        label="Envoyer"
+        [disabled]="!question.trim()"
+        (onClick)="sendQuestion()"
+      />
+
+      <p-button
+        *ngIf="streaming"
+        icon="pi pi-stop"
+        label="Arrêter"
+        severity="danger"
+        (onClick)="stopStreaming()"
+      />
+
+    </div>
+
+  </section>
+
+</div>

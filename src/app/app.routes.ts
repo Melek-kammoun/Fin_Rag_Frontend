@@ -9,7 +9,7 @@ export const routes: Routes = [
   {
     path: 'admin/regulations/upload',
     loadComponent: () =>
-      import('./pages/admin-regulation-upload.component').then(
+      import('./admin/admin-regulation-upload/admin-regulation-upload').then(
         (m) => m.AdminRegulationUploadComponent
       ),
   },

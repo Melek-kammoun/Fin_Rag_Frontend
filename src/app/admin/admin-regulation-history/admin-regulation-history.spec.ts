@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AdminRegulationHistory } from './admin-regulation-history';
+import { AdminRegulationHistoryComponent } from './admin-regulation-history';
 
-describe('AdminRegulationHistory', () => {
-  let component: AdminRegulationHistory;
-  let fixture: ComponentFixture<AdminRegulationHistory>;
+describe('AdminRegulationHistoryComponent', () => {
+  let component: AdminRegulationHistoryComponent;
+  let fixture: ComponentFixture<AdminRegulationHistoryComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdminRegulationHistory],
+      imports: [AdminRegulationHistoryComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdminRegulationHistory);
+    fixture = TestBed.createComponent(AdminRegulationHistoryComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

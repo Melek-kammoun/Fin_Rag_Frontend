@@ -34,6 +34,21 @@
 
         <div class="field">
           <label>
+            Regulation type
+            <p-select
+              [options]="categoryOptions"
+              [(ngModel)]="category"
+              name="category"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select a regulation type"
+              [fluid]="true"
+            />
+          </label>
+        </div>
+
+        <div class="field">
+          <label>
             Strategy
             <p-select
               [options]="strategyOptions"

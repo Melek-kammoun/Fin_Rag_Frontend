@@ -5,10 +5,13 @@
       [value]="jobs"
       [loading]="loading"
       [tableStyle]="{ 'min-width': '70rem' }"
+      [lazy]="true"
+      (onLazyLoad)="loadJobs($event)"
       [paginator]="true"
-      [rows]="10"
+      [rows]="rows"
+      [totalRecords]="totalRecords"
       [rowsPerPageOptions]="[5 ,10, 25, 50]"
-      [globalFilterFields]="['filename', 'strategy', 'status']"
+      [sortField]="'startedAt'"
       [sortOrder]="-1"
       responsiveLayout="scroll"
     >
@@ -19,8 +22,9 @@
             <input
               pInputText
               type="text"
-              placeholder="Search filename, strategy, status..."
-              (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+              placeholder="Search filename, strategy, error..."
+              [ngModel]="searchTerm"
+              (ngModelChange)="onSearchInput($event)"
             />
           </p-iconfield>
 
@@ -30,14 +34,14 @@
             optionLabel="label"
             optionValue="value"
             placeholder="Filter by status"
-            (onChange)="dt.filter($event.value, 'status', 'equals')"
+            (onChange)="onStatusFilterChange()"
             [showClear]="true"
           />
 
           <p-button
             label="Refresh"
             icon="pi pi-refresh"
-            (onClick)="loadJobs()"
+            (onClick)="refresh()"
             [loading]="loading"
           />
         </div>

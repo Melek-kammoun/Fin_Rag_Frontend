@@ -1,7 +1,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, OnDestroy, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Subscription, interval, startWith, switchMap, takeWhile } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { FileUploadModule, FileSelectEvent } from 'primeng/fileupload';
@@ -12,9 +12,15 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 
 import { AdminRegulationApiService } from '../../services/admin-regulation-api.service';
+import { JobSocketService } from '../../services/job-socket.service';
 import { IngestionJob } from '../../models/ingestion-job.model';
 
 type StrategyOption = {
+  label: string;
+  value: string;
+};
+
+type CategoryOption = {
   label: string;
   value: string;
 };
@@ -72,19 +78,21 @@ const INGESTION_STEPS: IngestionStep[] = [
 })
 export class AdminRegulationUploadComponent implements OnInit, OnDestroy {
   private readonly api = inject(AdminRegulationApiService);
+  private readonly jobSocket = inject(JobSocketService);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly storageKey = 'finrag-last-regulation-job-id';
   private readonly isBrowser = isPlatformBrowser(this.platformId);
 
   selectedFile: File | null = null;
   strategy = 'RULE';
+  category: string | null = null;
   chunkSize = 500;
   overlap = 100;
   submitting = false;
   errorMessage = '';
   currentJob: IngestionJob | null = null;
 
-  private pollSubscription?: Subscription;
+  private jobSubscription?: Subscription;
 
   readonly strategyOptions: StrategyOption[] = [
     { label: 'Rule', value: 'RULE' },
@@ -92,6 +100,15 @@ export class AdminRegulationUploadComponent implements OnInit, OnDestroy {
     { label: 'Block', value: 'BLOCK' },
     { label: 'Section', value: 'SECTION' },
     { label: 'LLM', value: 'LLM' },
+  ];
+
+  // Mirrors com.talan.finrag.enums.RegulationCategory on the backend.
+  readonly categoryOptions: CategoryOption[] = [
+    { label: 'MiFID II', value: 'MIFID_II' },
+    { label: 'CRR', value: 'CRR' },
+    { label: 'IFRS', value: 'IFRS' },
+    { label: 'PCG', value: 'PCG' },
+    { label: 'Autre', value: 'OTHER' },
   ];
 
   readonly steps: IngestionStep[] = INGESTION_STEPS;
@@ -103,7 +120,7 @@ export class AdminRegulationUploadComponent implements OnInit, OnDestroy {
 
     const savedJobId = localStorage.getItem(this.storageKey);
     if (savedJobId) {
-      this.startPolling(Number(savedJobId));
+      this.watchJob(Number(savedJobId));
     }
   }
 
@@ -125,12 +142,13 @@ export class AdminRegulationUploadComponent implements OnInit, OnDestroy {
     this.errorMessage = '';
     this.submitting = true;
     this.currentJob = null;
-    this.stopPolling();
+    this.stopWatching();
 
     this.api
       .createJob({
         file: this.selectedFile,
         strategy: this.strategy,
+        category: this.category ?? undefined,
         chunkSize: this.chunkSize,
         overlap: this.overlap,
       })
@@ -140,7 +158,7 @@ export class AdminRegulationUploadComponent implements OnInit, OnDestroy {
           if (this.isBrowser) {
             localStorage.setItem(this.storageKey, String(response.jobId));
           }
-          this.startPolling(response.jobId);
+          this.watchJob(response.jobId);
         },
         error: (error) => {
           this.submitting = false;
@@ -152,34 +170,28 @@ export class AdminRegulationUploadComponent implements OnInit, OnDestroy {
       });
   }
 
-  startPolling(jobId: number): void {
-    this.stopPolling();
+  private watchJob(jobId: number): void {
+    this.stopWatching();
 
-    this.pollSubscription = interval(3000)
-      .pipe(
-        startWith(0),
-        switchMap(() => this.api.getJob(jobId)),
-        takeWhile(
-          (job) => job.status !== 'COMPLETED' && job.status !== 'FAILED',
-          true
-        )
-      )
-      .subscribe({
-        next: (job) => {
-          this.currentJob = job;
+    // One-shot fetch so the panel shows the current state immediately,
+    // instead of waiting for the next status change to arrive over the socket
+    // (e.g. after a page refresh mid-ingestion).
+    this.api.getJob(jobId).subscribe({
+      next: (job) => (this.currentJob = job),
+      error: () => {
+        /* the websocket subscription below will still surface live updates */
+      },
+    });
 
-          if (job.status === 'COMPLETED' || job.status === 'FAILED') {
-            this.stopPolling();
-          }
-        },
-        error: (error) => {
-          this.errorMessage =
-            error?.error?.message ||
-            error?.message ||
-            'Unable to fetch job status.';
-          this.stopPolling();
-        },
-      });
+    this.jobSubscription = this.jobSocket.watchJob(jobId).subscribe({
+      next: (job) => {
+        this.currentJob = job;
+      },
+      error: (error) => {
+        this.errorMessage =
+          error?.error?.message || error?.message || 'Unable to receive job status updates.';
+      },
+    });
   }
 
   getTagSeverity(status: string):
@@ -267,14 +279,12 @@ export class AdminRegulationUploadComponent implements OnInit, OnDestroy {
     return strategy.charAt(0).toUpperCase() + strategy.slice(1).toLowerCase();
   }
 
-  private stopPolling(): void {
-    this.pollSubscription?.unsubscribe();
-    this.pollSubscription = undefined;
+  private stopWatching(): void {
+    this.jobSubscription?.unsubscribe();
+    this.jobSubscription = undefined;
   }
 
   ngOnDestroy(): void {
-    this.stopPolling();
+    this.stopWatching();
   }
 }
-
-
