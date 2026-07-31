@@ -1,7 +1,7 @@
 .history-container {
   display: flex;
   justify-content: center;
-  padding: 2rem;
+  padding: 1rem;
 }
 
 .history-card {
@@ -10,45 +10,118 @@
   gap: 1.5rem;
   width: 100%;
   max-width: 900px;
-  background: #fff;
-  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
   padding: 2rem;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-md);
 }
 
 .history-header {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
 
   .history-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
-    background: #eef0fb;
-    color: #1e1e2e;
-    font-size: 1.3rem;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    background: var(--gradient-brand);
+    color: #fff;
+    font-size: 1.4rem;
     flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
   }
 
-  h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1a2235;
+  .history-heading {
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--ink-900);
+    }
+
+    .history-subtitle {
+      font-size: 0.85rem;
+      color: var(--ink-500);
+      margin-top: 0.15rem;
+    }
   }
 
-  .history-subtitle {
-    font-size: 0.85rem;
-    color: #5a7a9a;
-    margin-top: 0.15rem;
+  .history-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: auto;
+    padding: 0.4rem 1.1rem;
+    background: var(--teal-50);
+    border-radius: var(--radius-sm);
+    line-height: 1.2;
+
+    .stat-value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--teal-600);
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      color: var(--ink-500);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+  }
+
+  .history-search {
+    width: 260px;
+
+    input {
+      width: 100%;
+    }
   }
 }
 
-.empty-row {
-  text-align: center;
-  color: #888;
-  padding: 1.5rem 0;
+.file-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+
+  .file-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: #fdeeee;
+    color: #e05252;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 2.5rem 1rem;
+  color: var(--ink-400);
+
+  i {
+    font-size: 1.8rem;
+  }
+
+  p {
+    font-size: 0.85rem;
+  }
+}
+
+.actions-col {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
 }

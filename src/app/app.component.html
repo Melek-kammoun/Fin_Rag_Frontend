@@ -1,11 +1,17 @@
 <div class="app-shell">
   <header class="app-header">
-    <span class="app-logo"><i class="pi pi-shield"></i> FinRAG</span>
+    <span class="app-logo">
+      <span class="app-logo-badge"><i class="pi pi-shield"></i></span>
+      FinRAG
+    </span>
+    <span class="app-header-tag">Plateforme de conformité financière</span>
   </header>
 
   <div class="app-body">
     <router-outlet />
   </div>
 
-
+  <footer class="app-footer">
+    <span>FinRAG &copy; {{ currentYear }} — Assistant documentaire réglementé</span>
+  </footer>
 </div>

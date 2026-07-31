@@ -2,48 +2,100 @@
   <div class="history-card">
     <div class="history-header">
       <span class="history-icon"><i class="pi pi-history"></i></span>
-      <div>
+      <div class="history-heading">
         <h2>Historique des ingestions</h2>
         <p class="history-subtitle">{{ subtitle }}</p>
       </div>
+
+      <div class="history-stat">
+        <span class="stat-value">{{ totalElements }}</span>
+        <span class="stat-label">document(s)</span>
+      </div>
+
+      <p-iconField iconPosition="left" class="history-search">
+        <p-inputIcon class="pi pi-search"></p-inputIcon>
+        <input
+          type="text"
+          pInputText
+          placeholder="Rechercher par nom de fichier…"
+          [ngModel]="filename"
+          (ngModelChange)="onSearchInput($event)" />
+      </p-iconField>
     </div>
 
     <p-table
       [value]="history"
       [loading]="loading"
+      [lazy]="true"
       [paginator]="true"
-      [rows]="10"
+      [rows]="size"
+      [first]="page * size"
+      [totalRecords]="totalElements"
+      [stripedRows]="true"
+      (onLazyLoad)="onLazyLoad($event)"
       [tableStyle]="{ 'min-width': '40rem' }">
       <ng-template #header>
         <tr>
           <th>Fichier</th>
-          <th>Chunks</th>
-          <th>Durée</th>
-          <th>Statut</th>
           <th>Date</th>
+          <th class="actions-col"></th>
         </tr>
       </ng-template>
 
       <ng-template #body let-item>
         <tr>
-          <td>{{ item.filename }}</td>
-          <td>{{ item.chunkCount }}</td>
-          <td>{{ item.durationMs }} ms</td>
           <td>
-            <p-tag
-              [value]="item.success ? 'Succès' : 'Échec'"
-              [severity]="item.success ? 'success' : 'danger'">
-            </p-tag>
+            <div class="file-cell">
+              <span class="file-badge"><i class="pi pi-file-pdf"></i></span>
+              {{ item.filename }}
+            </div>
           </td>
           <td>{{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td class="actions-col">
+            <p-button
+              *ngIf="item.pdfReference"
+              icon="pi pi-eye"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              pTooltip="Voir le PDF"
+              tooltipPosition="top"
+              (onClick)="viewPdf(item)">
+            </p-button>
+            <p-button
+              icon="pi pi-trash"
+              [text]="true"
+              [rounded]="true"
+              severity="danger"
+              pTooltip="Supprimer"
+              tooltipPosition="top"
+              (onClick)="confirmDelete(item)">
+            </p-button>
+          </td>
         </tr>
       </ng-template>
 
       <ng-template #emptymessage>
         <tr>
-          <td colspan="5" class="empty-row">Aucune ingestion enregistrée pour le moment.</td>
+          <td colspan="3">
+            <div class="empty-state">
+              <i class="pi pi-inbox"></i>
+              <p>Aucune ingestion enregistrée pour le moment.</p>
+            </div>
+          </td>
         </tr>
       </ng-template>
     </p-table>
   </div>
 </div>
+
+<p-dialog
+  header="Aperçu du PDF"
+  [(visible)]="pdfDialogVisible"
+  [modal]="true"
+  [style]="{ width: '70vw', height: '85vh' }"
+  [contentStyle]="{ height: '100%' }">
+  <iframe *ngIf="pdfUrl" [src]="pdfUrl" width="100%" height="100%" style="border: none;"></iframe>
+</p-dialog>
+
+<p-confirmDialog></p-confirmDialog>

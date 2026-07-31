@@ -1,23 +1,20 @@
 <div class="sidebar">
+  <div class="sidebar-header">
+    <span class="logo-badge"><i class="pi pi-shield"></i></span>
+    <div class="logo-text">
+      <span class="logo">FinRAG</span>
+      <span class="logo-role">Espace Admin</span>
+    </div>
+  </div>
 
-  <ul class="menu">
-    <li *ngFor="let item of menuItems">
-      <a *ngIf="!item.children" [routerLink]="item.route" routerLinkActive="active">
-        <i [class]="item.icon"></i>
-        <span>{{ item.label }}</span>
-      </a>
+  <span class="sidebar-section-label">Menu</span>
+  <p-panelMenu [model]="menuItems" styleClass="sidebar-menu" />
 
-      <a *ngIf="item.children" (click)="toggle(item)" class="has-children" [class.open]="item.open">
-        <i [class]="item.icon"></i>
-        <span>{{ item.label }}</span>
-        <i class="pi pi-chevron-down chevron"></i>
-      </a>
-
-      <ul class="submenu" *ngIf="item.children && item.open">
-        <li *ngFor="let child of item.children">
-          <a [routerLink]="child.route" routerLinkActive="active">{{ child.label }}</a>
-        </li>
-      </ul>
-    </li>
-  </ul>
+  <div class="sidebar-footer">
+    <span class="footer-avatar"><i class="pi pi-user"></i></span>
+    <div class="footer-text">
+      <strong>Administrateur</strong>
+      <span>Accès complet</span>
+    </div>
+  </div>
 </div>

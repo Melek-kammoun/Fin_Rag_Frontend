@@ -5,7 +5,10 @@
   .content {
     flex: 1;
     overflow-y: auto;
-    background-color: #f0f4f8;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(100, 181, 160, 0.08), transparent 45%),
+      radial-gradient(circle at 100% 20%, rgba(74, 143, 199, 0.06), transparent 40%),
+      var(--bg-app);
     padding: 2rem;
   }
 }

@@ -1,10 +1,20 @@
 <div class="sidebar">
-  <ul class="menu">
-    <li *ngFor="let item of menuItems">
-      <a [routerLink]="item.route" routerLinkActive="active">
-        <i [class]="item.icon"></i>
-        <span>{{ item.label }}</span>
-      </a>
-    </li>
-  </ul>
+  <div class="sidebar-header">
+    <span class="logo-badge"><i class="pi pi-shield"></i></span>
+    <div class="logo-text">
+      <span class="logo">FinRAG</span>
+      <span class="logo-role">Espace Utilisateur</span>
+    </div>
+  </div>
+
+  <span class="sidebar-section-label">Menu</span>
+  <p-panelMenu [model]="menuItems" styleClass="sidebar-menu" />
+
+  <div class="sidebar-footer">
+    <span class="footer-avatar"><i class="pi pi-user"></i></span>
+    <div class="footer-text">
+      <strong>Utilisateur</strong>
+      <span>Consultation & analyse</span>
+    </div>
+  </div>
 </div>

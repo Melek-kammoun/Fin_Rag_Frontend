@@ -1,66 +1,221 @@
-<div class="assistant-container">
-  <div class="assistant-card">
-    <div class="assistant-header">
-      <span class="assistant-icon"><i class="pi pi-comments"></i></span>
-      <div>
-        <h2>Assistant</h2>
-        <p class="assistant-subtitle">Posez une question sur vos rapports et la réglementation</p>
-      </div>
+<div class="assistant-layout">
+
+  <aside class="conversations-sidebar">
+    <div class="conversations-header">
+      <span class="conversations-title"><i class="pi pi-comments"></i> Discussions</span>
+      <p-button
+        icon="pi pi-plus"
+        [text]="true"
+        [rounded]="true"
+        severity="secondary"
+        pTooltip="Nouvelle discussion"
+        tooltipPosition="bottom"
+        (onClick)="newConversation()">
+      </p-button>
     </div>
 
-    <textarea
-      pTextarea
-      [(ngModel)]="question"
-      rows="3"
-      [autoResize]="true"
-      placeholder="Ex : Quel est le ratio de solvabilité mentionné dans le dernier rapport ?"
-      class="assistant-input">
-    </textarea>
+    <div class="conversations-list-wrapper">
+      <p-listbox
+        [options]="conversations"
+        optionLabel="title"
+        styleClass="conversations-listbox"
+        [emptyMessage]="conversationsLoading ? 'Chargement…' : 'Aucune discussion'">
+        <ng-template #item let-conv>
+          <div
+            class="conversation-item"
+            [class.active]="selectedConversation?.id === conv.id"
+            (click)="selectConversation(conv)">
+            <div class="conversation-item-main">
+              <span class="conversation-item-title">{{ conv.title }}</span>
+              <span class="conversation-item-meta">
+                <i class="pi" [ngClass]="conv.sourceFile ? 'pi-file' : 'pi-circle-off'"></i>
+                {{ conv.sourceFile || 'Sans document' }}
+              </span>
+            </div>
+            <button
+              type="button"
+              class="conversation-delete-btn"
+              (click)="confirmDelete(conv, $event)">
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        </ng-template>
+      </p-listbox>
+    </div>
+  </aside>
 
+  <section class="chat-panel">
+
+    <div class="chat-empty-state" *ngIf="!selectedConversation">
+      <i class="pi pi-comments"></i>
+      <p>Sélectionnez une discussion ou créez-en une nouvelle pour commencer.</p>
+      <p-button label="Nouvelle discussion" icon="pi pi-plus" (onClick)="newConversation()"></p-button>
+    </div>
+
+    <ng-container *ngIf="selectedConversation">
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <h2>{{ selectedConversation.title }}</h2>
+          <p-tag
+            *ngIf="selectedConversation.sourceFile; else noDoc"
+            [value]="selectedConversation.sourceFile"
+            severity="info">
+            <ng-template #icon>
+              <i class="pi pi-file"></i>
+            </ng-template>
+          </p-tag>
+          <ng-template #noDoc>
+            <span class="chat-header-nodoc">Aucun document associé</span>
+          </ng-template>
+        </div>
+        <p-button
+          label="Associer un rapport"
+          icon="pi pi-paperclip"
+          [text]="true"
+          severity="secondary"
+          (onClick)="openAttachDialog()">
+        </p-button>
+      </div>
+
+      <div class="chat-messages" #messagesContainer>
+
+        <div
+          *ngFor="let msg of messages"
+          class="chat-message"
+          [ngClass]="msg.role === 'USER' ? 'from-user' : 'from-assistant'">
+          <div class="chat-bubble" [class.error]="msg.isError">
+            <p>{{ msg.content }}<span class="typing-cursor" *ngIf="msg.streaming"></span></p>
+          </div>
+        </div>
+
+        <div class="chat-loading" *ngIf="loadingMessages">
+          <p-progressSpinner
+            [style]="{ width: '24px', height: '24px' }"
+            strokeWidth="5"
+            fill="transparent"
+            animationDuration="0.8s">
+          </p-progressSpinner>
+        </div>
+      </div>
+
+      <p-message
+        *ngIf="errorMessage"
+        severity="error"
+        [text]="errorMessage"
+        styleClass="chat-error-message">
+      </p-message>
+
+      <div class="chat-input-area">
+        <textarea
+          pTextarea
+          [(ngModel)]="question"
+          rows="2"
+          [autoResize]="true"
+          placeholder="Écrivez votre message…"
+          class="chat-input"
+          [disabled]="sending"
+          (keydown)="onKeydown($event)">
+        </textarea>
+        <p-button
+          icon="pi pi-send"
+          [loading]="sending"
+          [disabled]="!question.trim() || sending"
+          (onClick)="sendMessage()"
+          styleClass="chat-send-btn">
+        </p-button>
+      </div>
+    </ng-container>
+  </section>
+</div>
+
+<p-dialog
+  header="Associer un rapport"
+  [(visible)]="attachDialogVisible"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [draggable]="false"
+  [closable]="!attachUploading">
+  <div class="attach-dialog-content">
+    <p-selectButton
+      [options]="attachModeOptions"
+      [(ngModel)]="attachMode"
+      optionLabel="label"
+      optionValue="value"
+      [disabled]="attachUploading"
+      (onChange)="onAttachModeChange()">
+    </p-selectButton>
+
+    <ng-container *ngIf="attachMode === 'existing'">
+      <label>Rapport déjà ingéré</label>
+      <p-select
+        [options]="attachFileOptions"
+        [(ngModel)]="attachSelectedFile"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Sélectionner un rapport"
+        [filter]="true"
+        [loading]="attachLoading"
+        appendTo="body"
+        styleClass="attach-file-select">
+        <ng-template #item let-option>
+          <div class="attach-option">
+            <span class="attach-option-label">{{ option.label }}</span>
+            <span class="attach-option-meta">{{ option.meta }}</span>
+          </div>
+        </ng-template>
+      </p-select>
+    </ng-container>
+
+    <ng-container *ngIf="attachMode === 'upload'">
+      <label>Nouveau rapport (PDF)</label>
+      <input
+        type="file"
+        accept="application/pdf"
+        class="attach-file-input"
+        [disabled]="attachUploading"
+        (change)="onFileSelected($event)">
+
+      <div class="attach-upload-progress" *ngIf="attachUploading">
+        <p-progressSpinner
+          [style]="{ width: '20px', height: '20px' }"
+          strokeWidth="6"
+          fill="transparent"
+          animationDuration="0.8s">
+        </p-progressSpinner>
+        <span>{{ attachUploadStatus?.message || 'Envoi en cours…' }}</span>
+      </div>
+
+      <p-message *ngIf="attachUploadError" severity="error" [text]="attachUploadError"></p-message>
+    </ng-container>
+  </div>
+
+  <ng-template #footer>
     <p-button
-      [label]="loading ? 'Génération en cours…' : 'Envoyer'"
-      icon="pi pi-send"
-      [loading]="loading"
-      [disabled]="!question.trim() || loading"
-      (onClick)="ask()"
-      styleClass="assistant-btn">
+      label="Annuler"
+      [text]="true"
+      severity="secondary"
+      [disabled]="attachUploading"
+      (onClick)="attachDialogVisible = false">
     </p-button>
 
-    <div class="assistant-status" *ngIf="loading">
-      <p-progressSpinner
-        [style]="{ width: '28px', height: '28px' }"
-        strokeWidth="5"
-        fill="transparent"
-        animationDuration="0.8s"
-        ariaLabel="Génération en cours">
-      </p-progressSpinner>
-      <div class="assistant-status-text">
-        <strong>Recherche et génération en cours</strong>
-        <span>Analyse des documents et rédaction de la réponse…</span>
-      </div>
-    </div>
+    <p-button
+      *ngIf="attachMode === 'existing'"
+      label="Associer"
+      icon="pi pi-check"
+      [disabled]="!attachSelectedFile"
+      [loading]="attachLoading"
+      (onClick)="confirmAttachExisting()">
+    </p-button>
 
-    <div class="assistant-answer" *ngIf="response">
-      <h3>Réponse</h3>
-      <p>{{ response.answer }}</p>
+    <p-button
+      *ngIf="attachMode === 'upload'"
+      label="Uploader et associer"
+      icon="pi pi-upload"
+      [disabled]="!attachUploadFile || attachUploading"
+      [loading]="attachUploading"
+      (onClick)="startUpload()">
+    </p-button>
+  </ng-template>
+</p-dialog>
 
-      <div class="assistant-sources" *ngIf="response.sources.length">
-        <h4>Sources</h4>
-        <ul>
-          <li *ngFor="let source of response.sources">
-            <i class="pi pi-file"></i>
-            <span>{{ source.filename }}</span>
-            <span class="page">p.{{ source.page }}</span>
-            <span class="score">{{ (source.score * 100).toFixed(0) }}%</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <p-message
-      *ngIf="errorMessage"
-      severity="error"
-      [text]="errorMessage">
-    </p-message>
-  </div>
-</div>
+<p-confirmDialog></p-confirmDialog>
